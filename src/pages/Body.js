@@ -17,5 +17,16 @@ export default props => {
     console.log('update!');
   }, [name]);
 
-  return <span>{name}</span>;
+  return (
+    <div className={'layout'}>
+      <div className={'layout-inner'}>
+        <div className={'layout-main'}>
+          <span>A</span>
+        </div>
+        <div className={'layout-side'}>
+          <span>B</span>
+        </div>
+      </div>
+    </div>
+  );
 };

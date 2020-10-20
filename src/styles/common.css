@@ -27,3 +27,18 @@ h1, h2, h3, h4, h5, h6, span, p, a, input, textarea, button {
   height: auto;
   margin: 0 auto;
 }
+
+.layout-inner {
+  display: flex;
+  padding: 20px 0;
+}
+
+.layout-main {
+  width: 700px;
+  height: auto;
+  float: left;
+}
+
+.layout-side {
+  flex: 1;
+}

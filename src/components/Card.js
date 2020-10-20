@@ -2,7 +2,10 @@ import React from 'react';
 
 export default ({ text = '' }) => {
   return (
-    <div>
+    <div
+      style={{
+        width: '100%',
+      }}>
       <span>{text}</span>
     </div>
   );
