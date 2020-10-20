@@ -11,11 +11,15 @@ body {
   background-color: #fafafa;
 }
 
-h1, h2, h3, h4, h5, h6, span, p, a, input, textarea, button {
+h1, h2, h3, h4, h5, h6, p, a, input, textarea, button {
   color: #252525;
   font-family: 'NanumSquare', sans-serif;
   letter-spacing: -.05rem;
 }
+
+.ant-input-prefix {
+  margin-right: 7px !important;
+} 
 
 .layout {
   width: 100%;
