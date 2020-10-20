@@ -17,10 +17,6 @@ h1, h2, h3, h4, h5, h6, span, p, a, input, textarea, button {
   letter-spacing: -.05rem;
 }
 
-.application {
-
-}
-
 .layout {
   width: 100%;
   max-width: 1000px;
@@ -34,7 +30,8 @@ h1, h2, h3, h4, h5, h6, span, p, a, input, textarea, button {
 }
 
 .layout-main {
-  width: 700px;
+  width: 780px;
+  padding-right: 20px;
   height: auto;
   float: left;
 }

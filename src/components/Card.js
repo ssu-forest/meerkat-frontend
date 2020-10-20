@@ -5,6 +5,9 @@ export default ({ text = '' }) => {
     <div
       style={{
         width: '100%',
+        border: '1px solid #eee',
+        borderRadius: 10,
+        backgroundColor: '#fff',
       }}>
       <span>{text}</span>
     </div>
