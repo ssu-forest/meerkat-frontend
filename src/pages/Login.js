@@ -2,10 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Input, Button } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import Axios from 'axios';
 
 import LogoImage from '../assets/images/logo.png';
 
 import Colors from '../constants/Colors';
+
+const procLogin = async (id, pw) => {
+  if (id.trim() === '' || pw.trim() === '') {
+    return;
+  }
+
+  // Axios.post()
+};
 
 export default props => {
   const [name, setName] = React.useState(props.value); // hook
