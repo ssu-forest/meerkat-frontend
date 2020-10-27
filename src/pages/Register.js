@@ -186,7 +186,7 @@ export default () => {
                   color: '#fff',
                 }}
                 onClick={() => {
-                  if (password.trim() !== '') {
+                  if (password.trim() === '') {
                     message.warn('패스워드를 입력해주세요.');
                     return;
                   } else if (password.length < 8) {
