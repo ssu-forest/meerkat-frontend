@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Input, Button } from 'antd';
+import { message, Input, Button } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import Axios from 'axios';
 
@@ -8,16 +8,35 @@ import LogoImage from '../assets/images/logo.png';
 
 import Colors from '../constants/Colors';
 
-const procLogin = async (id, pw) => {
-  if (id.trim() === '' || pw.trim() === '') {
+const procLogin = async (email = '', password = '') => {
+  if (email.trim() === '' || password.trim() === '') {
+    message.warning('아이디와 패스워드를 모두 입력해주세요.');
     return;
   }
 
-  // Axios.post()
+  Axios.post(
+    '/auth/login',
+    {
+      email,
+      password,
+    },
+    {
+      withCredentials: true,
+    },
+  )
+    .then(response => {
+      // console.log(response.headers['set-cookie']);
+      console.log(response);
+    })
+    .catch(error => {
+      const { data } = error.response;
+      message.warning(data.message);
+    });
 };
 
 export default props => {
-  const [name, setName] = React.useState(props.value); // hook
+  const [email, setEmail] = React.useState(''); // hook
+  const [password, setPassword] = React.useState(''); // hook
 
   return (
     <div className={'layout'}>
@@ -46,6 +65,7 @@ export default props => {
             }}
             prefix={<UserOutlined />}
             placeholder={'이메일'}
+            onChange={({ target }) => setEmail(target.value)}
           />
           <Input
             type={'password'}
@@ -55,6 +75,7 @@ export default props => {
             }}
             prefix={<LockOutlined />}
             placeholder={'패스워드'}
+            onChange={({ target }) => setPassword(target.value)}
           />
           <Button
             block
@@ -63,6 +84,9 @@ export default props => {
               backgroundColor: Colors.mainColor,
               marginBottom: 10,
               color: '#fff',
+            }}
+            onClick={() => {
+              procLogin(email, password);
             }}>
             <span
               style={{
