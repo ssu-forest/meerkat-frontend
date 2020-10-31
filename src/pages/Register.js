@@ -15,8 +15,11 @@ import LogoImage from '../assets/images/logo.png';
 
 const EmailRegex = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
 
+const procEmailVerify = () => {};
+
+const procRegister = () => {};
+
 export default () => {
-  // const {} = useReactRouter;
   const { history } = useReactRouter();
 
   const [email, setEmail] = React.useState('');
@@ -25,10 +28,6 @@ export default () => {
   const [hasEmailVerify, setHasEmailVerify] = React.useState(false);
   const [password, setPassword] = React.useState('');
   const [rePassword, setRePassword] = React.useState('false');
-
-  const procEmailVerify = () => {};
-
-  const procRegister = () => {};
 
   return (
     <div className={'layout'}>
@@ -77,17 +76,20 @@ export default () => {
 
                 Axios.post('/join/user/find-id', {
                   email,
-                }).then(({ status, data }) => {
-                  console.log({ status, data });
-
-                  if (status === 200) {
-                    setTryVerify(true);
-                    message.success(`${email}의 메일함을 확인해주세요.`);
-                  } else {
-                    message.error(data.message);
-                    return;
-                  }
-                });
+                })
+                  .then(({ status, data }) => {
+                    if (status === 200) {
+                      setTryVerify(true);
+                      message.success(`${email}의 메일함을 확인해주세요.`);
+                    } else {
+                      message.error(data.message);
+                      return;
+                    }
+                  })
+                  .catch(error => {
+                    const { data } = error.response;
+                    message.warning(data.message);
+                  });
               }}>
               <span
                 style={{
@@ -202,16 +204,19 @@ export default () => {
                     password,
                     serviceYn: Define.isService ? 'y' : 'n',
                     emailYn: 'y',
-                  }).then(({ status, data }) => {
-                    if (data.id) {
-                      message.success('회원가입이 완료되었어요!');
-                      history.push('/user/login');
-                      return;
-                    } else {
-                      message.error(data.message);
-                      return;
-                    }
-                  });
+                  })
+                    .then(({ data: { data } }) => {
+                      if (data.id) {
+                        message.success('회원가입이 완료되었어요!');
+                        history.push('/account/login');
+                        return;
+                      } else {
+                      }
+                    })
+                    .catch(error => {
+                      const { data } = error.response;
+                      message.warning(data.message);
+                    });
                 }}>
                 <span
                   style={{
