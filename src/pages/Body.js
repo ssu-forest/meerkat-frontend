@@ -10,10 +10,9 @@ export default props => {
   const [cardList, setCardList] = React.useState([]);
 
   React.useEffect(() => {
-    Axios.get('https://ian-api.herokuapp.com/test/api').then(reseponse => {
-      const {
-        data: { data },
-      } = reseponse;
+    //Axios.get('https://ian-api.herokuapp.com/test/api').then(response => {
+    Axios.get('http://211.197.33.90:3000/board/1').then(response => {
+      const { data } = response;
 
       console.log(data);
 
@@ -28,18 +27,21 @@ export default props => {
           {cardList.map((v, i) => {
             return (
               <div
+                key={i}
                 style={{
                   margin: 20,
                 }}>
                 <Card
                   key={i}
-                  boardTitle={v.title}
-                  boardContents={v.contents}
-                  boardWriter={v.writer}
-                  dateTime={v.datetime}
-                  like={v.like}
-                  comments={v.comments}
+                  boardId={v.boardid}
+                  boardTitle={v.boardtitle}
+                  boardContents={v.boardcontents}
+                  boardWriter={v.userid}
+                  dateTime={v.writedt}
+                  like={v.likecount}
+                  /*comments={v.comments}*/
                 />
+
                 <Input
                   style={{
                     height: 35,

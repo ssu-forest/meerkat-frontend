@@ -1,10 +1,11 @@
 import { RedEnvelopeFilled } from '@ant-design/icons';
 import React from 'react';
-
-//import Comment from '../components/Comment';
+import { Input, Button } from 'antd';
+import Colors from '../constants/Colors';
 
 export default ({
   boardContents = '',
+  boardId = '',
   boardWriter = '',
   dateTime = '',
   boardTitle = '',
@@ -21,15 +22,38 @@ export default ({
       }}>
       <p>제목 : {boardTitle}</p>
       <p>작성자 : {boardWriter}</p>
-      <p>날짜 : {dateTime}</p>
+      {<p>날짜 : {dateTime}</p>}
       <p>게시글내용 : {boardContents}</p>
-      <p>Like : {like}</p>
-      {comments.map((comment, i) => {
+
+      <Button
+        onClick={() => {
+          console.log('button clicked');
+          /*
+          update like increase api
+
+          */
+        }}
+        block
+        style={{
+          height: 30,
+          width: 50,
+          backgroundColor: 'red',
+          marginBottom: 10,
+          padding: 0,
+          color: '#fff',
+        }}>
+        <span
+          style={{
+            color: Colors.white,
+          }}>
+          🤍 {like}
+        </span>
+      </Button>
+      {/*comments.map((comment, i) => {
         return (
           <p
             key={i}
             style={{
-              backgroundColor: 'red',
               margin: 20,
             }}>
             <span>
@@ -51,7 +75,8 @@ export default ({
               })}
           </p>
         );
-      })}
+      })
+      */}
     </div>
   );
 };
