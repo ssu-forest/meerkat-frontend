@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Button } from 'antd';
+import { Button } from 'antd';
 import TextareaAutoSize from 'react-textarea-autosize';
 import Axios from 'axios';
 
@@ -36,12 +36,16 @@ export default props => {
           style={{
             width: '100%',
             padding: 10,
-            fontSize: 16,
+            fontSize: 15,
+            borderRadius: 5,
             border: 'none',
             resize: 'none',
-            backgroundColor: '#fafafa',
+            backgroundColor: Colors.placeholder,
           }}
           placeholder={randomComment}
+          onChange={({ target }) => {
+            setContent(target.value);
+          }}
         />
         <Button
           style={{

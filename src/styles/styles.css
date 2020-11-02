@@ -8,13 +8,3 @@
 .header-logo {
     height: 50px; 
 }
-
-@-webkit-keyframes heartBlast {
-    0% {background-position: left;}
-    100% {background-position: right;}
-}
-
-@keyframes heartBlast {
-    0% {background-position: left;}
-    100% {background-position: right;}
-} 

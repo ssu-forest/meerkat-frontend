@@ -1,14 +1,10 @@
 import React from 'react';
 import Axios from 'axios';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { Input, Button } from 'antd';
 
 import Card from '../components/Card';
 import Editor from '../components/Editor';
-import Colors from '../constants/Colors';
 
 export default props => {
-  const [name, setName] = React.useState(props.value); // hook
   const [cardList, setCardList] = React.useState([]);
 
   React.useEffect(() => {

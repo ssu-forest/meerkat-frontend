@@ -1,7 +1,8 @@
 import React from 'react';
-import { Input, Button } from 'antd';
+import { Avatar, Input, Button } from 'antd';
 import { HeartTwoTone } from '@ant-design/icons';
 import Heart from 'react-animated-heart';
+import Moment from 'moment';
 
 import Colors from '../constants/Colors';
 
@@ -14,9 +15,26 @@ export default ({
   like = 0,
   comments = [],
 }) => {
+  const [heartAnimation, activeHeartAnimation] = React.useState(false);
+  const [animationFlag, setAnimationFlag] = React.useState(false);
   const [isAlreadyLike, setIsAlreadyLike] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(like);
   const [inputComment, setInputComment] = React.useState('');
+
+  const writerName = `익명${boardWriter}`;
+
+  React.useEffect(() => {
+    if (heartAnimation) {
+      setTimeout(() => {
+        setAnimationFlag(true);
+      }, 0);
+
+      setTimeout(() => {
+        setAnimationFlag(false);
+        activeHeartAnimation(false);
+      }, 1000);
+    }
+  }, [heartAnimation]);
 
   return (
     <div
@@ -26,18 +44,41 @@ export default ({
       }}>
       <div
         style={{
-          padding: 10,
+          padding: 15,
           borderBottom: '1px solid #eee',
         }}>
-        <span
-          style={{
-            fontSize: 15,
-            fontWeight: 'bold',
-            display: 'block',
-          }}>
-          익명{boardWriter}
-        </span>
-        <span>{dateTime}</span>
+        <div>
+          <div
+            style={{
+              marginRight: 10,
+              verticalAlign: 'middle',
+              display: 'inline-block',
+            }}>
+            <Avatar>{writerName[0]}</Avatar>
+          </div>
+          <div
+            style={{
+              verticalAlign: 'middle',
+              display: 'inline-block',
+            }}>
+            <span
+              style={{
+                fontSize: 15,
+                fontWeight: 'bold',
+                display: 'block',
+              }}>
+              {writerName}
+            </span>
+            <span
+              style={{
+                color: '#aaa',
+              }}>
+              {Moment(dateTime, 'YYYY-MM-DD,HH:mm:ss')
+                .startOf('hour')
+                .fromNow()}
+            </span>
+          </div>
+        </div>
       </div>
       <div
         style={{
@@ -46,7 +87,29 @@ export default ({
           backgroundImage: `url(https://picsum.photos/700/700)`,
           backgroundSize: 'cover',
         }}
-      />
+        onDoubleClick={() => {
+          activeHeartAnimation(true);
+          if (!isAlreadyLike) {
+            setIsAlreadyLike(true);
+            setLikeCount(likeCount + 1);
+          }
+        }}>
+        {heartAnimation && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              backgroundColor: 'rgba(255, 255, 255, .3)',
+              borderRadius: '50%',
+              transition: 'all .3s',
+              zoom: 1.2,
+            }}>
+            <Heart isClick={animationFlag} />
+          </div>
+        )}
+      </div>
       <div
         style={{
           padding: 10,
@@ -104,7 +167,13 @@ export default ({
           return (
             <div key={i}>
               <span>
-                <b>익명{comment.userId}</b> {comment.contents}
+                <b
+                  style={{
+                    marginRight: 5,
+                  }}>
+                  익명{comment.userId}
+                </b>
+                {comment.contents}
               </span>
               {comment.reply &&
                 comment.reply.map((reComment, i) => {
@@ -129,28 +198,30 @@ export default ({
           <Input
             style={{
               flex: 1,
-              height: 35,
+              height: 36,
               marginRight: 5,
               float: 'left',
+              backgroundColor: Colors.placeholder,
+              borderRadius: 16,
             }}
+            bordered={false}
+            value={inputComment}
             placeholder={'댓글을 입력해주세요.'}
             onChange={({ target }) => {
               setInputComment(target.value);
             }}
             onKeyPress={({ which }) => {
               if (which === 13) {
-                alert(inputComment);
               }
             }}
           />
           <Button
             type='primary'
+            shape={'round'}
             style={{
-              height: 35,
+              height: 36,
             }}
-            onClick={() => {
-              alert(inputComment);
-            }}>
+            onClick={() => {}}>
             <span>작성</span>
           </Button>
         </div>
