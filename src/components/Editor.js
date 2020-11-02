@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from 'antd';
 import TextareaAutoSize from 'react-textarea-autosize';
-import Axios from 'axios';
 
 import Colors from '../constants/Colors';
 
@@ -17,9 +16,9 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-export default props => {
+export default ({ onUpload = () => {} }) => {
   const [randomComment, setRandomComment] = React.useState('');
-  const [content, setContent] = React.useState('');
+  const [contents, setContents] = React.useState('');
 
   React.useEffect(() => {
     const templateIndex = getRandomInt(0, randomCommentTemplate.length - 1);
@@ -43,8 +42,9 @@ export default props => {
             backgroundColor: Colors.placeholder,
           }}
           placeholder={randomComment}
+          value={contents}
           onChange={({ target }) => {
-            setContent(target.value);
+            setContents(target.value);
           }}
         />
         <Button
@@ -53,13 +53,8 @@ export default props => {
           }}
           block
           onClick={() => {
-            Axios.post('/board/write', {
-              title: '',
-              content,
-              category: 'free',
-            }).then(response => {
-              console.log(response);
-            });
+            onUpload(contents);
+            setContents('');
           }}>
           <span>게시</span>
         </Button>

@@ -1,8 +1,11 @@
 import React from 'react';
 import Axios from 'axios';
+import Moment from 'moment';
 
 import Card from '../components/Card';
 import Editor from '../components/Editor';
+
+import { Define } from '../constants';
 
 export default props => {
   const [cardList, setCardList] = React.useState([]);
@@ -14,7 +17,7 @@ export default props => {
 
       console.log(data);
 
-      setCardList(data);
+      setCardList(data.reverse());
     });
   }, []);
 
@@ -23,7 +26,23 @@ export default props => {
       <div className={'layout-inner'}>
         <div className={'layout-main'}>
           <div className={'ui-card'}>
-            <Editor />
+            <Editor
+              onUpload={contents => {
+                const temp = [...cardList];
+                temp.unshift({
+                  comment: [{}],
+                  contents,
+                  id: null,
+                  likeCount: 0,
+                  modifyDt: Moment().format(Define.dateFormat),
+                  title: '',
+                  userId: 0,
+                  viewCount: 0,
+                  writeDt: Moment().format(Define.dateFormat),
+                });
+                setCardList(temp);
+              }}
+            />
           </div>
           {cardList.map((v, i) => {
             return (

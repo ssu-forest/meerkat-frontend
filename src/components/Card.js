@@ -4,7 +4,7 @@ import { HeartTwoTone } from '@ant-design/icons';
 import Heart from 'react-animated-heart';
 import Moment from 'moment';
 
-import Colors from '../constants/Colors';
+import { Define, Colors } from '../constants';
 
 export default ({
   boardContents = '',
@@ -20,8 +20,21 @@ export default ({
   const [isAlreadyLike, setIsAlreadyLike] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(like);
   const [inputComment, setInputComment] = React.useState('');
+  const [commentList, setCommentList] = React.useState(comments);
 
   const writerName = `익명${boardWriter}`;
+
+  // 데모용 코드
+  const addCommentList = () => {
+    setCommentList([
+      ...commentList,
+      {
+        userId: 0,
+        contents: inputComment,
+      },
+    ]);
+    setInputComment('');
+  };
 
   React.useEffect(() => {
     if (heartAnimation) {
@@ -73,7 +86,7 @@ export default ({
               style={{
                 color: '#aaa',
               }}>
-              {Moment(dateTime, 'YYYY-MM-DD,HH:mm:ss')
+              {Moment(dateTime, Define.dateFormat)
                 .startOf('hour')
                 .fromNow()}
             </span>
@@ -163,7 +176,7 @@ export default ({
         style={{
           padding: 10,
         }}>
-        {comments.map((comment, i) => {
+        {commentList.map((comment, i) => {
           return (
             <div key={i}>
               <span>
@@ -212,6 +225,7 @@ export default ({
             }}
             onKeyPress={({ which }) => {
               if (which === 13) {
+                addCommentList();
               }
             }}
           />
@@ -221,7 +235,9 @@ export default ({
             style={{
               height: 36,
             }}
-            onClick={() => {}}>
+            onClick={() => {
+              addCommentList();
+            }}>
             <span>작성</span>
           </Button>
         </div>
