@@ -43,3 +43,10 @@ h1, h2, h3, h4, h5, h6, p, a, input, textarea, button {
 .layout-side {
   flex: 1;
 }
+
+.ui-card {
+  width: 100%;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background-color: #fff;
+}
