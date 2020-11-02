@@ -49,7 +49,7 @@ export default ({
           🤍 {like}
         </span>
       </Button>
-      {/*comments.map((comment, i) => {
+      {comments.map((comment, i) => {
         return (
           <p
             key={i}
@@ -57,10 +57,9 @@ export default ({
               margin: 20,
             }}>
             <span>
-              - <b>{comment.writer}</b>
+              - <b>{comment.userId}</b>
             </span>
-            <span> : {comment.comment}</span>
-            <span> / {comment.datetime}</span>
+            <span> : {comment.contents}</span>
             {comment.reply &&
               comment.reply.map((reComment, i) => {
                 return (
@@ -75,8 +74,7 @@ export default ({
               })}
           </p>
         );
-      })
-      */}
+      })}
     </div>
   );
 };

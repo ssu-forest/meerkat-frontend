@@ -11,7 +11,7 @@ export default props => {
 
   React.useEffect(() => {
     //Axios.get('https://ian-api.herokuapp.com/test/api').then(response => {
-    Axios.get('http://211.197.33.90:3000/board/1').then(response => {
+    Axios.get('http://211.197.33.90:3000/board/free').then(response => {
       const { data } = response;
 
       console.log(data);
@@ -33,13 +33,13 @@ export default props => {
                 }}>
                 <Card
                   key={i}
-                  boardId={v.boardid}
-                  boardTitle={v.boardtitle}
-                  boardContents={v.boardcontents}
-                  boardWriter={v.userid}
-                  dateTime={v.writedt}
-                  like={v.likecount}
-                  /*comments={v.comments}*/
+                  boardId={v.id}
+                  boardTitle={v.title}
+                  boardContents={v.contents}
+                  boardWriter={v.userId}
+                  dateTime={v.writeDt}
+                  like={v.likeCount}
+                  comments={v.comment}
                 />
 
                 <Input
