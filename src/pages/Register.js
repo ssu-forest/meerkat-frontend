@@ -210,7 +210,6 @@ export default () => {
                         message.success('회원가입이 완료되었어요!');
                         history.push('/account/login');
                         return;
-                      } else {
                       }
                     })
                     .catch(error => {

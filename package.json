@@ -10,10 +10,12 @@
     "antd": "^4.7.0",
     "axios": "^0.21.0",
     "react": "^16.13.1",
+    "react-animated-heart": "0.0.5",
     "react-dom": "^16.13.1",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
+    "react-textarea-autosize": "^8.2.0",
     "use-react-router": "^1.0.7"
   },
   "scripts": {

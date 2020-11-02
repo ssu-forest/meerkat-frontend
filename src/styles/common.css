@@ -11,6 +11,10 @@ body {
   background-color: #fafafa;
 }
 
+div {
+  position: relative;
+}
+
 h1, h2, h3, h4, h5, h6, p, a, input, textarea, button {
   color: #252525;
   font-family: 'NanumSquare', sans-serif;

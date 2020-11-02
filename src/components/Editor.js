@@ -51,10 +51,10 @@ export default props => {
           onClick={() => {
             Axios.post('/board/write', {
               title: '',
-              content: content,
+              content,
               category: 'free',
             }).then(response => {
-              // console.log(repsons);
+              console.log(response);
             });
           }}>
           <span>게시</span>

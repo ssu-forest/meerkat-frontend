@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input, Button } from 'antd';
-import { ConsoleSqlOutlined, RedEnvelopeFilled } from '@ant-design/icons';
+import { HeartTwoTone } from '@ant-design/icons';
 import Heart from 'react-animated-heart';
 
 import Colors from '../constants/Colors';
@@ -14,7 +14,6 @@ export default ({
   like = 0,
   comments = [],
 }) => {
-  // 이미 하트를 누른 상태를 나타내는 변수
   const [isAlreadyLike, setIsAlreadyLike] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(like);
   const [inputComment, setInputComment] = React.useState('');
@@ -25,10 +24,65 @@ export default ({
       style={{
         marginTop: 15,
       }}>
-      <p>작성자 : {boardWriter}</p>
-      <p>날짜 : {dateTime}</p>
-      <p>게시글내용 : {boardContents}</p>
-      <div className='App'>
+      <div
+        style={{
+          padding: 10,
+          borderBottom: '1px solid #eee',
+        }}>
+        <span
+          style={{
+            fontSize: 15,
+            fontWeight: 'bold',
+            display: 'block',
+          }}>
+          익명{boardWriter}
+        </span>
+        <span>{dateTime}</span>
+      </div>
+      <div
+        style={{
+          width: '100%',
+          paddingTop: '100%',
+          backgroundImage: `url(https://picsum.photos/700/700)`,
+          backgroundSize: 'cover',
+        }}
+      />
+      <div
+        style={{
+          padding: 10,
+          borderBottom: '1px solid #eee',
+        }}>
+        <p
+          style={{
+            fontSize: 15,
+          }}>
+          {boardContents}
+        </p>
+        <div>
+          <HeartTwoTone
+            style={{
+              fontSize: 16,
+              marginRight: 3,
+            }}
+            twoToneColor={isAlreadyLike ? '#eb2f96' : '#aaa'}
+            onClick={() => {
+              if (!isAlreadyLike) {
+                setLikeCount(likeCount + 1);
+              } else {
+                setLikeCount(likeCount - 1);
+              }
+              setIsAlreadyLike(!isAlreadyLike);
+            }}
+          />
+          <span
+            style={{
+              fontSize: 16,
+            }}>
+            {likeCount}
+          </span>
+        </div>
+      </div>
+      {/* <div className='App'>
         <Heart
           isClick={isAlreadyLike}
           onClick={() => {
@@ -41,19 +95,17 @@ export default ({
           }}
         />
         <span>{likeCount}</span>
-      </div>
-      {comments.userId &&
-        comments.map((comment, i) => {
+      </div> */}
+      <div
+        style={{
+          padding: 10,
+        }}>
+        {comments.map((comment, i) => {
           return (
-            <p
-              key={i}
-              style={{
-                margin: 20,
-              }}>
+            <div key={i}>
               <span>
-                - <b>{comment.userId}</b>
+                <b>익명{comment.userId}</b> {comment.contents}
               </span>
-              <span> : {comment.contents}</span>
               {comment.reply &&
                 comment.reply.map((reComment, i) => {
                   return (
@@ -66,24 +118,43 @@ export default ({
                     </p>
                   );
                 })}
-            </p>
+            </div>
           );
         })}
-      <Input
-        style={{
-          height: 35,
-          marginBottom: 10,
-        }}
-        placeholder={'댓글을 입력해주세요.'}
-        onChange={({ target }) => {
-          setInputComment(target.value);
-        }}
-        onKeyPress={({ which }) => {
-          if (which === 13) {
-            alert(inputComment);
-          }
-        }}
-      />
+        <div
+          style={{
+            marginTop: 10,
+            display: 'flex',
+          }}>
+          <Input
+            style={{
+              flex: 1,
+              height: 35,
+              marginRight: 5,
+              float: 'left',
+            }}
+            placeholder={'댓글을 입력해주세요.'}
+            onChange={({ target }) => {
+              setInputComment(target.value);
+            }}
+            onKeyPress={({ which }) => {
+              if (which === 13) {
+                alert(inputComment);
+              }
+            }}
+          />
+          <Button
+            type='primary'
+            style={{
+              height: 35,
+            }}
+            onClick={() => {
+              alert(inputComment);
+            }}>
+            <span>작성</span>
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
