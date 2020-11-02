@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { message, Input, Button } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import Axios from 'axios';
+import useReactRouter from 'use-react-router';
 
 import LogoImage from '../assets/images/logo.png';
 
 import Colors from '../constants/Colors';
 
-const procLogin = async (email = '', password = '') => {
+const procLogin = async (email = '', password = '', history = {}) => {
   if (email.trim() === '' || password.trim() === '') {
     message.warning('아이디와 패스워드를 모두 입력해주세요.');
     return;
@@ -24,9 +25,11 @@ const procLogin = async (email = '', password = '') => {
       withCredentials: true,
     },
   )
-    .then(response => {
-      // console.log(response.headers['set-cookie']);
-      console.log(response);
+    .then(({ data }) => {
+      if (data.authorization) {
+        Axios.defaults.headers.common['Authorization'] = data.authorization;
+        history.push('/');
+      }
     })
     .catch(error => {
       const { data } = error.response;
@@ -37,6 +40,7 @@ const procLogin = async (email = '', password = '') => {
 export default props => {
   const [email, setEmail] = React.useState(''); // hook
   const [password, setPassword] = React.useState(''); // hook
+  const { history } = useReactRouter();
 
   return (
     <div className={'layout'}>
@@ -86,7 +90,7 @@ export default props => {
               color: '#fff',
             }}
             onClick={() => {
-              procLogin(email, password);
+              procLogin(email, password, history);
             }}>
             <span
               style={{
