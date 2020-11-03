@@ -20,7 +20,7 @@ export default ({
   const [isAlreadyLike, setIsAlreadyLike] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(like);
   const [inputComment, setInputComment] = React.useState('');
-  const [commentList, setCommentList] = React.useState(comments);
+  const [commentList, setCommentList] = React.useState([]);
 
   const writerName = `익명${boardWriter}`;
 
@@ -97,7 +97,7 @@ export default ({
         style={{
           width: '100%',
           paddingTop: '100%',
-          backgroundImage: `url(https://picsum.photos/700/700)`,
+          backgroundImage: `url(https://picsum.photos/700/700?${boardId})`,
           backgroundSize: 'cover',
         }}
         onDoubleClick={() => {
@@ -177,6 +177,10 @@ export default ({
           padding: 10,
         }}>
         {commentList.map((comment, i) => {
+          if (!comment.contents) {
+            return <div key={i} />;
+          }
+
           return (
             <div key={i}>
               <span>
@@ -206,6 +210,7 @@ export default ({
         <div
           style={{
             marginTop: 10,
+            marginBottom: 5,
             display: 'flex',
           }}>
           <Input
@@ -219,12 +224,12 @@ export default ({
             }}
             bordered={false}
             value={inputComment}
-            placeholder={'댓글을 입력해주세요.'}
+            placeholder={'등록하실 댓글을 입력해주세요.'}
             onChange={({ target }) => {
               setInputComment(target.value);
             }}
             onKeyPress={({ which }) => {
-              if (which === 13) {
+              if (which === 13 && inputComment.trim() !== '') {
                 addCommentList();
               }
             }}
@@ -236,7 +241,9 @@ export default ({
               height: 36,
             }}
             onClick={() => {
-              addCommentList();
+              if (inputComment.trim() !== '') {
+                addCommentList();
+              }
             }}>
             <span>작성</span>
           </Button>
