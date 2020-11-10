@@ -91,7 +91,9 @@ export default ({
               style={{
                 color: '#aaa',
               }}>
-              {Moment(dateTime, Define.dateFormat).startOf('hour').fromNow()}
+              {Moment(dateTime, Define.dateFormat)
+                .startOf('hour')
+                .fromNow()}
             </span>
           </div>
         </div>
@@ -131,12 +133,18 @@ export default ({
           padding: 10,
           borderBottom: '1px solid #eee',
         }}>
-        <p
-          style={{
-            fontSize: 15,
-          }}>
-          {boardContents}
-        </p>
+        {boardContents.split('\n').map((text, i) => {
+          return (
+            <p
+              key={i}
+              style={{
+                fontSize: 15,
+                marginBottom: 5,
+              }}>
+              {text}
+            </p>
+          );
+        })}
         <div>
           <HeartTwoTone
             style={{
