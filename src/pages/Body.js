@@ -10,8 +10,7 @@ import { Define } from '../constants';
 export default props => {
   const [cardList, setCardList] = React.useState([]);
 
-  React.useEffect(() => {
-    //Axios.get('https://ian-api.herokuapp.com/test/api').then(response => {
+  const loadContents = () => {
     Axios.get('http://211.197.33.90:3000/board/free').then(response => {
       const { data } = response;
 
@@ -19,31 +18,21 @@ export default props => {
 
       setCardList(data.reverse());
     });
+  };
+
+  React.useEffect(() => {
+    loadContents();
   }, []);
 
   return (
     <div className={'layout'}>
       <div className={'layout-inner'}>
         <div className={'layout-main'}>
-          <div className={'ui-card'}>
-            <Editor
-              onUpload={contents => {
-                const temp = [...cardList];
-                temp.unshift({
-                  comment: [{}],
-                  contents,
-                  id: null,
-                  likeCount: 0,
-                  modifyDt: Moment().format(Define.dateFormat),
-                  title: '',
-                  userId: 0,
-                  viewCount: 0,
-                  writeDt: Moment().format(Define.dateFormat),
-                });
-                setCardList(temp);
-              }}
-            />
-          </div>
+          <Editor
+            onUpload={() => {
+              loadContents();
+            }}
+          />
           {cardList.map((v, i) => {
             return (
               <div key={i}>
