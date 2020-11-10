@@ -34,6 +34,7 @@ const Pages = () => {
           <Route exact path={'/'} component={Main} />
         ) : (
           <>
+            <Route exact path={'/'} component={Login} />
             <Route exact path={'/account/login'} component={Login} />
             <Route exact path={'/account/register'} component={Register} />
             <Route exact path={'/account/find'} component={FindAccount} />
