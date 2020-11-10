@@ -55,7 +55,7 @@ export default props => {
                   boardWriter={v.userId}
                   dateTime={v.writeDt}
                   like={v.likeCount}
-                  comments={v.comment}
+                  comment={v.comment}
                 />
               </div>
             );

@@ -1,6 +1,11 @@
 import React from 'react';
 import { Avatar, Input, Button } from 'antd';
-import { HeartTwoTone } from '@ant-design/icons';
+import {
+  HeartTwoTone,
+  RightCircleFilled,
+  RightCircleTwoTone,
+  RightOutlined,
+} from '@ant-design/icons';
 import Heart from 'react-animated-heart';
 import Moment from 'moment';
 
@@ -13,14 +18,14 @@ export default ({
   dateTime = '',
   boardTitle = '',
   like = 0,
-  comments = [],
+  comment = [],
 }) => {
   const [heartAnimation, activeHeartAnimation] = React.useState(false);
   const [animationFlag, setAnimationFlag] = React.useState(false);
   const [isAlreadyLike, setIsAlreadyLike] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(like);
   const [inputComment, setInputComment] = React.useState('');
-  const [commentList, setCommentList] = React.useState([]);
+  const [commentList, setCommentList] = React.useState(comment);
 
   const writerName = `익명${boardWriter}`;
 
@@ -86,9 +91,7 @@ export default ({
               style={{
                 color: '#aaa',
               }}>
-              {Moment(dateTime, Define.dateFormat)
-                .startOf('hour')
-                .fromNow()}
+              {Moment(dateTime, Define.dateFormat).startOf('hour').fromNow()}
             </span>
           </div>
         </div>
@@ -142,6 +145,7 @@ export default ({
             }}
             twoToneColor={isAlreadyLike ? '#eb2f96' : '#aaa'}
             onClick={() => {
+              //TODO 좋아요 업데이트 기능 구현 필요
               if (!isAlreadyLike) {
                 setLikeCount(likeCount + 1);
               } else {
@@ -191,6 +195,15 @@ export default ({
                   익명{comment.userId}
                 </b>
                 {comment.contents}
+                <Button
+                  type='dashed'
+                  shape={'circle'}
+                  style={{
+                    marginLeft: 15,
+                    height: 30,
+                  }}>
+                  X
+                </Button>
               </span>
               {comment.reply &&
                 comment.reply.map((reComment, i) => {
@@ -201,6 +214,7 @@ export default ({
                       </span>
                       <span> : {reComment.comment}</span>
                       <span>{reComment.datetime}</span>
+                      <span>X</span>
                     </p>
                   );
                 })}
@@ -241,6 +255,7 @@ export default ({
               height: 36,
             }}
             onClick={() => {
+              //TODO 댓글 등록 기능 구현 필요
               if (inputComment.trim() !== '') {
                 addCommentList();
               }
