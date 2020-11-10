@@ -54,15 +54,20 @@ export default ({ onUpload = () => {} }) => {
           }}
           block
           onClick={() => {
+            let text = content.replace(/\n$/gm, '');
+
             Axios.post('/board/write', {
               title: '',
-              content,
+              content: text,
               category: 'free',
-            }).catch(error => {
-              const { data } = error.response;
-              message.warning(data.message);
-            });
-            onUpload(content);
+            })
+              .then(() => {
+                onUpload();
+              })
+              .catch(error => {
+                const { data } = error.response;
+                message.warning(data.message);
+              });
             setContent('');
           }}>
           <span>게시</span>

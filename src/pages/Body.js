@@ -1,13 +1,10 @@
 import React from 'react';
 import Axios from 'axios';
-import Moment from 'moment';
 
 import Card from '../components/Card';
 import Editor from '../components/Editor';
 
-import { Define } from '../constants';
-
-export default props => {
+export default () => {
   const [cardList, setCardList] = React.useState([]);
 
   const loadContents = () => {
@@ -27,7 +24,9 @@ export default props => {
         <div className={'layout-main'}>
           <Editor
             onUpload={() => {
-              loadContents();
+              setTimeout(() => {
+                loadContents();
+              }, 500);
             }}
           />
           {cardList.map((v, i) => {
