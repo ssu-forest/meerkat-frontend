@@ -11,12 +11,9 @@ export default props => {
   const [cardList, setCardList] = React.useState([]);
 
   const loadContents = () => {
-    Axios.get('http://211.197.33.90:3000/board/free').then(response => {
+    Axios.get('/board/free').then(response => {
       const { data } = response;
-
-      console.log(data);
-
-      setCardList(data.reverse());
+      setCardList(data);
     });
   };
 

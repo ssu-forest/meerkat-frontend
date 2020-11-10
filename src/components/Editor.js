@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'antd';
+import { message, Button } from 'antd';
 import TextareaAutoSize from 'react-textarea-autosize';
 import Axios from 'axios';
 
@@ -58,8 +58,9 @@ export default ({ onUpload = () => {} }) => {
               title: '',
               content,
               category: 'free',
-            }).then(response => {
-              console.log(response);
+            }).catch(error => {
+              const { data } = error.response;
+              message.warning(data.message);
             });
             onUpload(content);
             setContent('');

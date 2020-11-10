@@ -1,5 +1,5 @@
 export default {
   isService: false,
-  host: 'http://211.197.33.90:3000',
+  host: 'https://dev.atticfriends.com/',
   dateFormat: 'YYYY-MM-DD,HH:mm:ss',
 };

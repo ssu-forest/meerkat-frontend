@@ -9,38 +9,42 @@ import LogoImage from '../assets/images/logo.png';
 
 import Colors from '../constants/Colors';
 
-const procLogin = async (email = '', password = '', history = {}) => {
-  if (email.trim() === '' || password.trim() === '') {
-    message.warning('아이디와 패스워드를 모두 입력해주세요.');
-    return;
-  }
-
-  Axios.post(
-    '/auth/login',
-    {
-      email,
-      password,
-    },
-    {
-      withCredentials: true,
-    },
-  )
-    .then(({ data }) => {
-      if (data.authorization) {
-        Axios.defaults.headers.common['Authorization'] = data.authorization;
-        history.push('/');
-      }
-    })
-    .catch(error => {
-      const { data } = error.response;
-      message.warning(data.message);
-    });
-};
-
-export default props => {
+export default () => {
   const [email, setEmail] = React.useState(''); // hook
   const [password, setPassword] = React.useState(''); // hook
   const { history } = useReactRouter();
+
+  const procLogin = async (email = '', password = '') => {
+    if (email.trim() === '' || password.trim() === '') {
+      message.warning('아이디와 패스워드를 모두 입력해주세요.');
+      return;
+    }
+
+    Axios.post(
+      '/auth/login',
+      {
+        email,
+        password,
+      },
+      {
+        withCredentials: true,
+      },
+    )
+      .then(({ data }) => {
+        if (data.authorization) {
+          Axios.defaults.headers.common['Authorization'] = data.authorization;
+          window.sessionStorage.setItem('authorization', data.authorization);
+          setTimeout(() => {
+            history.push('/');
+            window.location.reload();
+          }, 300);
+        }
+      })
+      .catch(error => {
+        const { data } = error.response;
+        message.warning(data.message);
+      });
+  };
 
   return (
     <div className={'layout'}>
@@ -90,7 +94,7 @@ export default props => {
               color: '#fff',
             }}
             onClick={() => {
-              procLogin(email, password, history);
+              procLogin(email, password);
             }}>
             <span
               style={{
