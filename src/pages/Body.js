@@ -61,9 +61,6 @@ export default props => {
             );
           })}
         </div>
-        <div className={'layout-side'}>
-          <span>B</span>
-        </div>
       </div>
     </div>
   );
