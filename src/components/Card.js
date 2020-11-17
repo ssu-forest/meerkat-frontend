@@ -1,15 +1,13 @@
 import React from 'react';
-import { Avatar, Input, Button } from 'antd';
-import {
-  HeartTwoTone,
-  RightCircleFilled,
-  RightCircleTwoTone,
-  RightOutlined,
-} from '@ant-design/icons';
+import { Link } from 'react-router-dom';
+import { Avatar, Dropdown, Input, Button, message, Menu } from 'antd';
+import { HeartTwoTone } from '@ant-design/icons';
 import Heart from 'react-animated-heart';
 import Moment from 'moment';
 
+import useReactRouter from 'use-react-router';
 import { Define, Colors } from '../constants';
+import Axios from 'axios';
 
 export default ({
   boardContents = '',
@@ -26,7 +24,7 @@ export default ({
   const [likeCount, setLikeCount] = React.useState(like);
   const [inputComment, setInputComment] = React.useState('');
   const [commentList, setCommentList] = React.useState(comment);
-
+  const { history } = useReactRouter();
   const writerName = `익명${boardWriter}`;
 
   // 데모용 코드
@@ -41,6 +39,48 @@ export default ({
     setInputComment('');
   };
 
+  const buttonMenu = (
+    <Menu>
+      <Menu.Item>
+        <Link
+          to={''}
+          onClick={() => {
+            Axios.post('/board/modify', {
+              title: '',
+              content: '',
+              category: 'free',
+            })
+              .then(() => {
+                //onUpload();
+              })
+              .catch(error => {
+                const { data } = error.response;
+                message.warning(data.message);
+              });
+            //setContent('');
+          }}>
+          수정
+        </Link>
+      </Menu.Item>
+      <Menu.Item>
+        <Link to='delCard'>삭제</Link>
+      </Menu.Item>
+    </Menu>
+  );
+  //카드삭제
+  const delCard = async (board_id = '') => {
+    //TODO 권한 체크
+    Axios.post('/board/delete', { board_id })
+      .then(({ data }) => {
+        setTimeout(() => {
+          window.location.reload();
+        }, 300);
+      })
+      .catch(error => {
+        const { data } = error.response;
+        message.warning(data.message);
+      });
+  };
   React.useEffect(() => {
     if (heartAnimation) {
       setTimeout(() => {
@@ -91,10 +131,25 @@ export default ({
               style={{
                 color: '#aaa',
               }}>
-              {Moment(dateTime, Define.dateFormat)
-                .startOf('hour')
-                .fromNow()}
+              {Moment(dateTime, Define.dateFormat).startOf('hour').fromNow()}
             </span>
+            <Dropdown
+              overlay={buttonMenu}
+              size={40}
+              placement='bottomRight'
+              arrow>
+              <Button
+                shape={'circle'}
+                style={{
+                  marginLeft: 115,
+                  height: 30,
+                }}
+                onClick={() => {
+                  console.log('!!!!!!click!!!');
+                }}>
+                ...
+              </Button>
+            </Dropdown>
           </div>
         </div>
       </div>
