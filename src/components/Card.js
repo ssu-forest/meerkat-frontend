@@ -43,8 +43,8 @@ export default ({
     <Menu>
       <Menu.Item>
         <Link
-          to={''}
-          onClick={() => {
+          to={''} //TODO 여기에 지금 내 현재 주소 어떻게 넣는지 물어보기, 파라메터 넘길순 있는지 물어보기
+          onClick={() => async (board_id = '') => {
             Axios.post('/board/modify', {
               title: '',
               content: '',
