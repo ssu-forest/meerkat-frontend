@@ -1,9 +1,15 @@
 import React from 'react';
 import { message, Button } from 'antd';
+import { FileImageOutlined } from '@ant-design/icons';
 import TextareaAutoSize from 'react-textarea-autosize';
+import { FilePond } from 'react-filepond';
 import Axios from 'axios';
 
+import 'filepond/dist/filepond.min.css';
+
 import Colors from '../constants/Colors';
+
+const allowImageExtension = ['png', 'pneg', 'jpg', 'jpeg', 'gif', 'bmp'];
 
 const randomCommentTemplate = [
   '오늘의 기분은 어떠세요?',
@@ -25,6 +31,8 @@ function getRandomInt(min, max) {
 
 export default ({ onUpload = () => {} }) => {
   const [randomComment, setRandomComment] = React.useState('');
+  const [useImage, setUseImage] = React.useState(false);
+  const [imageList, setImageList] = React.useState([]);
   const [content, setContent] = React.useState('');
 
   React.useEffect(() => {
@@ -54,7 +62,44 @@ export default ({ onUpload = () => {} }) => {
             setContent(target.value);
           }}
         />
+        <div
+          style={{
+            margin: '10px 0',
+          }}>
+          <Button
+            type={useImage ? 'primary' : 'default'}
+            shape={'round'}
+            icon={<FileImageOutlined />}
+            onClick={() => {
+              setUseImage(!useImage);
+            }}>
+            사진
+          </Button>
+        </div>
+        {useImage && (
+          <FilePond
+            files={imageList}
+            onupdatefiles={async images => {
+              let temp = [];
+              for await (let image of images) {
+                if (allowImageExtension.includes(image.fileExtension)) {
+                  temp.push(image.file);
+                } else {
+                  message.warn('선택 파일이 사진 형식이 아닙니다.');
+                }
+              }
+              setImageList(temp);
+            }}
+            allowMultiple
+            allowReorder
+            maxFiles={5}
+            // server='/api'
+            name={'image'}
+            labelIdle='이 곳을 선택하여<br/>업로드할 이미지를 선택해주세요.'
+          />
+        )}
         <Button
+          type={'primary'}
           style={{
             marginTop: 5,
           }}
@@ -65,6 +110,7 @@ export default ({ onUpload = () => {} }) => {
             Axios.post('/board/write', {
               title: '',
               content: text,
+              images: useImage ? imageList : [],
               category: 'free',
             })
               .then(() => {
@@ -75,6 +121,8 @@ export default ({ onUpload = () => {} }) => {
                 message.warning(data.message);
               });
             setContent('');
+            setUseImage(false);
+            setImageList([]);
           }}>
           <span>게시</span>
         </Button>
