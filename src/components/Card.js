@@ -21,53 +21,150 @@ export default ({
   const [heartAnimation, activeHeartAnimation] = React.useState(false);
   const [animationFlag, setAnimationFlag] = React.useState(false);
   const [isAlreadyLike, setIsAlreadyLike] = React.useState(false);
+  const [tryBoardUpdate, setTryBoardUpdate] = React.useState(false);
+  const [tryCommentUpdate, setTryCommentUpdate] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(like);
   const [inputComment, setInputComment] = React.useState('');
   const [commentList, setCommentList] = React.useState(comment);
   const { history } = useReactRouter();
   const writerName = `익명${boardWriter}`;
 
-  // 데모용 코드
-  const addCommentList = () => {
-    setCommentList([
-      ...commentList,
-      {
-        userId: 0,
-        contents: inputComment,
-      },
-    ]);
-    setInputComment('');
+  // 댓글 추가
+  const addCommentList = (boardId, comment) => {
+    Axios.post('/comment/write', {
+      boardId,
+      comment,
+    })
+      .then(({ data }) => {
+        setTimeout(() => {
+          history.push('/');
+          window.location.reload();
+        }, 300);
+      })
+      .catch(error => {
+        const { data } = error.response;
+        message.warning(data.message);
+      });
   };
-
-  const buttonMenu = (
+  //댓글 삭제
+  const delCommentList = commentId => {
+    Axios.post('/comment/delete', {
+      commentId,
+    })
+      .then(({ data }) => {
+        console.log(data);
+        setTimeout(() => {
+          history.push('/');
+          window.location.reload();
+        }, 300);
+      })
+      .catch(error => {
+        const { data } = error.response;
+        message.warning(data.message);
+      });
+  };
+  //댓글 수정
+  const commentMenu = (
     <Menu>
       <Menu.Item>
-        <Link
-          to={''} //TODO 여기에 지금 내 현재 주소 어떻게 넣는지 물어보기, 파라메터 넘길순 있는지 물어보기
-          onClick={() => async (board_id = '') => {
-            Axios.post('/board/modify', {
-              title: '',
-              content: '',
+        <Button
+          onClick={() => {
+            //TODO  댓글 에디터블
+            setTryCommentUpdate(true);
+
+            /*Axios.post('/comment/modify', {
+              title: '', //질문 1. 여기에 파라메터 어떻게 넘기는가
+              content: `${boardContents}`,
               category: 'free',
             })
-              .then(() => {
+              .then(({ data }) => {
                 //onUpload();
+                console.log(data);
+                setTimeout(() => {
+                  history.push('/');
+                  window.location.reload();
+                }, 300);
               })
               .catch(error => {
                 const { data } = error.response;
                 message.warning(data.message);
-              });
-            //setContent('');
+              });*/
           }}>
           수정
-        </Link>
+        </Button>
       </Menu.Item>
       <Menu.Item>
-        <Link to='delCard'>삭제</Link>
+        <Button
+          onClick={() => {
+            //TODO 권한 체크
+            Axios.post(`/comment/delete/${comment.commentId}`)
+              .then(({ data }) => {
+                setTimeout(() => {
+                  window.location.reload();
+                }, 300);
+              })
+              .catch(error => {
+                const { data } = error.response;
+                console.log(data);
+                message.warning(data.message);
+              });
+          }}>
+          삭제
+        </Button>
       </Menu.Item>
     </Menu>
   );
-  //카드삭제
+  const buttonMenu = (
+    <Menu>
+      <Menu.Item>
+        <Button
+          onClick={() => {
+            //TODO edit mode 로 전환
+            setTryCommentUpdate(true);
+            /*
+            Axios.post('/board/modify', {
+              title: '', //질문 1. 여기에 파라메터 어떻게 넘기는가
+              content: `${boardContents}`,
+              category: 'free',
+            })
+              .then(({ data }) => {
+                //onUpload();
+                console.log(data);
+                setTimeout(() => {
+                  history.push('/');
+                  window.location.reload();
+                }, 300);
+              })
+              .catch(error => {
+                const { data } = error.response;
+                message.warning(data.message);
+              });*/
+          }}>
+          수정
+        </Button>
+      </Menu.Item>
+      <Menu.Item>
+        <Button
+          onClick={() => {
+            //TODO 권한 체크
+            Axios.post(`/board/delete/${boardId}`)
+              .then(({ data }) => {
+                setTimeout(() => {
+                  window.location.reload();
+                }, 300);
+              })
+              .catch(error => {
+                const { data } = error.response;
+                console.log(data);
+                message.warning(data.message);
+              });
+          }}>
+          삭제
+        </Button>
+      </Menu.Item>
+    </Menu>
+  );
+  //카드삭제 - 원래 이렇게 했던것
   const delCard = async (board_id = '') => {
     //TODO 권한 체크
     Axios.post('/board/delete', { board_id })
@@ -142,11 +239,8 @@ export default ({
                 shape={'circle'}
                 style={{
                   marginLeft: 115,
-                  height: 30,
                 }}
-                onClick={() => {
-                  console.log('!!!!!!click!!!');
-                }}>
+                onClick={() => {}}>
                 ...
               </Button>
             </Dropdown>
@@ -258,17 +352,25 @@ export default ({
                   익명{comment.userId}
                 </b>
                 {comment.contents}
-                <Button
-                  type='dashed'
-                  shape={'circle'}
-                  style={{
-                    marginLeft: 15,
-                    height: 30,
-                  }}>
-                  X
-                </Button>
+                <Dropdown
+                  overlay={commentMenu}
+                  size={40}
+                  placement='bottomRight'
+                  arrow>
+                  <Button
+                    shape={'circle'}
+                    style={{
+                      marginLeft: 15,
+                    }}
+                    onClick={() => {
+                      //댓글 삭제 버튼
+                      delCommentList(comment.commentId);
+                    }}>
+                    X
+                  </Button>
+                </Dropdown>
               </span>
-              {comment.reply &&
+              {/*comment.reply &&
                 comment.reply.map((reComment, i) => {
                   return (
                     <p key={i}>
@@ -280,7 +382,7 @@ export default ({
                       <span>X</span>
                     </p>
                   );
-                })}
+                })*/}
             </div>
           );
         })}
@@ -305,9 +407,10 @@ export default ({
             onChange={({ target }) => {
               setInputComment(target.value);
             }}
+            //엔터 치면 댓글 등록
             onKeyPress={({ which }) => {
               if (which === 13 && inputComment.trim() !== '') {
-                addCommentList();
+                addCommentList(boardId, inputComment);
               }
             }}
           />
@@ -318,9 +421,9 @@ export default ({
               height: 36,
             }}
             onClick={() => {
-              //TODO 댓글 등록 기능 구현 필요
+              //댓글 등록 버튼
               if (inputComment.trim() !== '') {
-                addCommentList();
+                addCommentList(boardId, inputComment);
               }
             }}>
             <span>작성</span>
