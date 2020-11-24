@@ -10,6 +10,8 @@
     "antd": "^4.7.0",
     "axios": "^0.21.0",
     "filepond": "^4.23.1",
+    "filepond-plugin-image-exif-orientation": "^1.0.9",
+    "filepond-plugin-image-preview": "^4.6.4",
     "moment": "^2.29.1",
     "react": "^16.13.1",
     "react-animated-heart": "0.0.5",
@@ -18,7 +20,9 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
+    "react-swipeable": "^6.0.0",
     "react-textarea-autosize": "^8.2.0",
+    "react-use": "^15.3.4",
     "use-react-router": "^1.0.7"
   },
   "scripts": {

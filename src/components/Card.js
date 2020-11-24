@@ -1,23 +1,28 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Avatar, Dropdown, Input, Button, message, Menu } from 'antd';
 import { HeartTwoTone } from '@ant-design/icons';
 import Heart from 'react-animated-heart';
 import Moment from 'moment';
-
+import { useWindowSize } from 'react-use';
+import { useSwipeable } from 'react-swipeable';
 import useReactRouter from 'use-react-router';
+
 import { Define, Colors } from '../constants';
 import Axios from 'axios';
 
 export default ({
-  boardContents = '',
   boardId = '',
-  boardWriter = '',
-  dateTime = '',
   boardTitle = '',
+  boardWriter = '',
+  boardContents = '',
+  boardImages = [],
+  dateTime = '',
   like = 0,
   comment = [],
 }) => {
+  const { width: windowWidth, height: windowHeight } = useWindowSize();
+  const contentSize = windowWidth - 22;
+
   const [heartAnimation, activeHeartAnimation] = React.useState(false);
   const [animationFlag, setAnimationFlag] = React.useState(false);
   const [isAlreadyLike, setIsAlreadyLike] = React.useState(false);
@@ -26,26 +31,38 @@ export default ({
   const [likeCount, setLikeCount] = React.useState(like);
   const [inputComment, setInputComment] = React.useState('');
   const [commentList, setCommentList] = React.useState(comment);
+  const [imageIndex, setImageIndex] = React.useState(0);
+
   const { history } = useReactRouter();
+
   const writerName = `익명${boardWriter}`;
 
-  // 댓글 추가
-  const addCommentList = (boardId, comment) => {
-    Axios.post('/comment/write', {
-      boardId,
-      comment,
-    })
-      .then(({ data }) => {
-        setTimeout(() => {
-          history.push('/');
-          window.location.reload();
-        }, 300);
-      })
-      .catch(error => {
-        const { data } = error.response;
-        message.warning(data.message);
-      });
+  const imageSwipeHandler = useSwipeable({
+    onSwipedLeft: () => {
+      const moveIndex = imageIndex + 1;
+      if (moveIndex <= boardImages.length - 1) {
+        setImageIndex(moveIndex);
+      }
+    },
+    onSwipedRight: () => {
+      const moveIndex = imageIndex - 1;
+      if (moveIndex >= 0) {
+        setImageIndex(moveIndex);
+      }
+    },
+  });
+
+  const addCommentList = () => {
+    setCommentList([
+      ...commentList,
+      {
+        userId: 0,
+        contents: inputComment,
+      },
+    ]);
+    setInputComment('');
   };
+
   //댓글 삭제
   const delCommentList = commentId => {
     Axios.post('/comment/delete', {
@@ -63,6 +80,7 @@ export default ({
         message.warning(data.message);
       });
   };
+
   //댓글 수정
   const commentMenu = (
     <Menu>
@@ -164,6 +182,7 @@ export default ({
       </Menu.Item>
     </Menu>
   );
+
   //카드삭제 - 원래 이렇게 했던것
   const delCard = async (board_id = '') => {
     //TODO 권한 체크
@@ -228,7 +247,9 @@ export default ({
               style={{
                 color: '#aaa',
               }}>
-              {Moment(dateTime, Define.dateFormat).startOf('hour').fromNow()}
+              {Moment(dateTime, Define.dateFormat)
+                .startOf('hour')
+                .fromNow()}
             </span>
             <Dropdown
               overlay={buttonMenu}
@@ -247,36 +268,91 @@ export default ({
           </div>
         </div>
       </div>
-      <div
-        style={{
-          width: '100%',
-          paddingTop: '100%',
-          backgroundImage: `url(https://picsum.photos/700/700?${boardId})`,
-          backgroundSize: 'cover',
-        }}
-        onDoubleClick={() => {
-          activeHeartAnimation(true);
-          if (!isAlreadyLike) {
-            setIsAlreadyLike(true);
-            setLikeCount(likeCount + 1);
-          }
-        }}>
-        {heartAnimation && (
+      {boardImages.length >= 1 && (
+        <div
+          style={{
+            position: 'relative',
+            width: contentSize,
+            height: contentSize,
+            overflow: 'hidden',
+          }}
+          onDoubleClick={() => {
+            console.log('run');
+            activeHeartAnimation(true);
+            if (!isAlreadyLike) {
+              setIsAlreadyLike(true);
+              setLikeCount(likeCount + 1);
+            }
+          }}
+          {...imageSwipeHandler}>
+          {heartAnimation && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                backgroundColor: 'rgba(255, 255, 255, .3)',
+                borderRadius: '50%',
+                transition: 'all .3s',
+                zoom: 1.1,
+                zIndex: 100,
+              }}>
+              <Heart isClick={animationFlag} />
+            </div>
+          )}
           <div
             style={{
               position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              backgroundColor: 'rgba(255, 255, 255, .3)',
-              borderRadius: '50%',
+              left: contentSize * -imageIndex,
+              width: contentSize * boardImages.length,
               transition: 'all .3s',
-              zoom: 1.2,
             }}>
-            <Heart isClick={animationFlag} />
+            {boardImages.map((image, i) => (
+              <div
+                key={i}
+                style={{
+                  width: contentSize,
+                  height: contentSize,
+                  backgroundImage: `url(https://picsum.photos/700/700?${boardId})`,
+                  backgroundSize: 'cover',
+                  float: 'left',
+                }}>
+                {/* <img src={`${Define.host}uploads/${image}`} alt={'사진'} /> */}
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+          {boardImages.length >= 2 && (
+            <div
+              style={{
+                position: 'absolute',
+                width: boardImages.length * 20,
+                height: 23,
+                left: '50%',
+                marginLeft: -(boardImages.length * 20) / 2,
+                backgroundColor: 'rgba(0, 0, 0, .3)',
+                bottom: 25,
+                borderRadius: 20,
+                textAlign: 'center',
+              }}>
+              {boardImages.map((e, i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: 10,
+                    height: 10,
+                    margin: '0 2px',
+                    backgroundColor:
+                      imageIndex === i ? Colors.mainColor : Colors.placeholder,
+                    borderRadius: 5,
+                    display: 'inline-block',
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       <div
         style={{
           padding: 10,
@@ -289,6 +365,7 @@ export default ({
               style={{
                 fontSize: 15,
                 marginBottom: 5,
+                wordBreak: 'break-all',
               }}>
               {text}
             </p>
@@ -351,24 +428,21 @@ export default ({
                   }}>
                   익명{comment.userId}
                 </b>
-                {comment.contents}
-                <Dropdown
-                  overlay={commentMenu}
-                  size={40}
-                  placement='bottomRight'
-                  arrow>
-                  <Button
-                    shape={'circle'}
-                    style={{
-                      marginLeft: 15,
-                    }}
-                    onClick={() => {
-                      //댓글 삭제 버튼
-                      delCommentList(comment.commentId);
-                    }}>
-                    X
-                  </Button>
-                </Dropdown>
+                <span
+                  style={{
+                    wordBreak: 'break-all',
+                  }}>
+                  {comment.contents}
+                </span>
+                <Button
+                  type='dashed'
+                  shape={'circle'}
+                  style={{
+                    marginLeft: 15,
+                    height: 30,
+                  }}>
+                  X
+                </Button>
               </span>
               {/*comment.reply &&
                 comment.reply.map((reComment, i) => {

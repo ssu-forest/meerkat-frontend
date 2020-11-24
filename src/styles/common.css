@@ -47,12 +47,11 @@ h1, h2, h3, h4, h5, h6, p, a, input, textarea, button {
 .layout-main {
   width: 100%;
   height: auto;
+  padding: 0 10px;
 }
 
 .ui-card {
-  width: 95%;
   border: 1px solid #eee;
   border-radius: 10px;
-  margin: 0 auto;
   background-color: #fff;
 }
