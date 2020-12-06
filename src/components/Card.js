@@ -52,22 +52,30 @@ export default ({
     },
   });
 
-  const addCommentList = () => {
-    setCommentList([
-      ...commentList,
-      {
-        userId: 0,
-        contents: inputComment,
-      },
-    ]);
-    setInputComment('');
+  React.useEffect(() => {
+    setTryBoardUpdate();
+  }, []);
+
+  const addCommentList = (boardId, comment) => {
+    Axios.post('/comment/write', {
+      boardId,
+      comment,
+    })
+      .then(({ data }) => {
+        setTimeout(() => {
+          history.push('/');
+          window.location.reload();
+        }, 300);
+      })
+      .catch(error => {
+        const { data } = error.response;
+        message.warning(data.message);
+      });
   };
 
   //댓글 삭제
   const delCommentList = commentId => {
-    Axios.post('/comment/delete', {
-      commentId,
-    })
+    Axios.post('/comment/delete', { commentId })
       .then(({ data }) => {
         console.log(data);
         setTimeout(() => {
@@ -138,7 +146,7 @@ export default ({
         <Button
           onClick={() => {
             //TODO edit mode 로 전환
-            setTryCommentUpdate(true);
+            setTryBoardUpdate(true);
             /*
             Axios.post('/board/modify', {
               title: '', //질문 1. 여기에 파라메터 어떻게 넘기는가
@@ -247,9 +255,7 @@ export default ({
               style={{
                 color: '#aaa',
               }}>
-              {Moment(dateTime, Define.dateFormat)
-                .startOf('hour')
-                .fromNow()}
+              {Moment(dateTime, Define.dateFormat).startOf('hour').fromNow()}
             </span>
             <Dropdown
               overlay={buttonMenu}
@@ -435,11 +441,13 @@ export default ({
                   {comment.contents}
                 </span>
                 <Button
-                  type='dashed'
                   shape={'circle'}
                   style={{
                     marginLeft: 15,
-                    height: 30,
+                  }}
+                  onClick={() => {
+                    //댓글 삭제 버튼
+                    delCommentList(comment.commentId);
                   }}>
                   X
                 </Button>
