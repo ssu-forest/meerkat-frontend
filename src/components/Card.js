@@ -1,4 +1,5 @@
 import React from 'react';
+import Axios from 'axios';
 import { Avatar, Dropdown, Input, Button, message, Menu } from 'antd';
 import { HeartTwoTone } from '@ant-design/icons';
 import Heart from 'react-animated-heart';
@@ -6,29 +7,33 @@ import Moment from 'moment';
 import { useWindowSize } from 'react-use';
 import { useSwipeable } from 'react-swipeable';
 import useReactRouter from 'use-react-router';
-import MenuImage from '../assets/images/menu.png';
+import TextareaAutoSize from 'react-textarea-autosize';
+
 import { Define, Colors } from '../constants';
-import Axios from 'axios';
+import { getToken, getUserId } from '../utils/Auth';
+
+import CommentMenuImage from '../assets/images/commentMenu.png';
+import MenuImage from '../assets/images/menu.png';
 
 export default ({
   boardId = '',
   boardTitle = '',
   boardWriter = '',
-  boardContents = '',
+  boardContents: defaultBoardContent = '',
   boardImages = [],
   dateTime = '',
   like = 0,
   comment = [],
 }) => {
   const { width: windowWidth, height: windowHeight } = useWindowSize();
-  const contentSize = windowWidth - 22;
+  const contentSize = (windowWidth > 1000 ? 1000 : windowWidth) - 22;
 
   const [heartAnimation, activeHeartAnimation] = React.useState(false);
   const [animationFlag, setAnimationFlag] = React.useState(false);
   const [isAlreadyLike, setIsAlreadyLike] = React.useState(false);
-  const [tryBoardUpdate, setTryBoardUpdate] = React.useState(false);
-  const [tryCommentUpdate, setTryCommentUpdate] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(like);
+  const [isBoardEditMode, setBoardEditMode] = React.useState(false);
+  const [boardContent, setBoardContent] = React.useState(defaultBoardContent);
   const [inputComment, setInputComment] = React.useState('');
   const [commentList, setCommentList] = React.useState(comment);
   const [imageIndex, setImageIndex] = React.useState(0);
@@ -52,10 +57,7 @@ export default ({
     },
   });
 
-  React.useEffect(() => {
-    setTryBoardUpdate();
-  }, []);
-
+  // 댓글 등록
   const addCommentList = (boardId, comment) => {
     Axios.post('/comment/write', {
       boardId,
@@ -73,138 +75,6 @@ export default ({
       });
   };
 
-  //댓글 삭제
-  const delCommentList = commentId => {
-    Axios.post('/comment/delete', { commentId })
-      .then(({ data }) => {
-        console.log(data);
-        setTimeout(() => {
-          history.push('/');
-          window.location.reload();
-        }, 300);
-      })
-      .catch(error => {
-        const { data } = error.response;
-        message.warning(data.message);
-      });
-  };
-
-  //댓글 수정
-  const commentMenu = (
-    <Menu>
-      <Menu.Item>
-        <Button
-          onClick={() => {
-            //TODO  댓글 에디터블
-            setTryCommentUpdate(true);
-
-            /*Axios.post('/comment/modify', {
-              title: '', //질문 1. 여기에 파라메터 어떻게 넘기는가
-              content: `${boardContents}`,
-              category: 'free',
-            })
-              .then(({ data }) => {
-                //onUpload();
-                console.log(data);
-                setTimeout(() => {
-                  history.push('/');
-                  window.location.reload();
-                }, 300);
-              })
-              .catch(error => {
-                const { data } = error.response;
-                message.warning(data.message);
-              });*/
-          }}>
-          수정
-        </Button>
-      </Menu.Item>
-      <Menu.Item>
-        <Button
-          onClick={() => {
-            //TODO 권한 체크
-            Axios.post(`/comment/delete/${comment.commentId}`)
-              .then(({ data }) => {
-                setTimeout(() => {
-                  window.location.reload();
-                }, 300);
-              })
-              .catch(error => {
-                const { data } = error.response;
-                console.log(data);
-                message.warning(data.message);
-              });
-          }}>
-          삭제
-        </Button>
-      </Menu.Item>
-    </Menu>
-  );
-  const buttonMenu = (
-    <Menu>
-      <Menu.Item>
-        <Button
-          onClick={() => {
-            //TODO edit mode 로 전환
-            setTryBoardUpdate(true);
-            /*
-            Axios.post('/board/modify', {
-              title: '', //질문 1. 여기에 파라메터 어떻게 넘기는가
-              content: `${boardContents}`,
-              category: 'free',
-            })
-              .then(({ data }) => {
-                //onUpload();
-                console.log(data);
-                setTimeout(() => {
-                  history.push('/');
-                  window.location.reload();
-                }, 300);
-              })
-              .catch(error => {
-                const { data } = error.response;
-                message.warning(data.message);
-              });*/
-          }}>
-          수정
-        </Button>
-      </Menu.Item>
-      <Menu.Item>
-        <Button
-          onClick={() => {
-            //TODO 권한 체크
-            Axios.post(`/board/delete/${boardId}`)
-              .then(({ data }) => {
-                setTimeout(() => {
-                  window.location.reload();
-                }, 300);
-              })
-              .catch(error => {
-                const { data } = error.response;
-                console.log(data);
-                message.warning(data.message);
-              });
-          }}>
-          삭제
-        </Button>
-      </Menu.Item>
-    </Menu>
-  );
-
-  //카드삭제 - 원래 이렇게 했던것
-  const delCard = async (board_id = '') => {
-    //TODO 권한 체크
-    Axios.post('/board/delete', { board_id })
-      .then(({ data }) => {
-        setTimeout(() => {
-          window.location.reload();
-        }, 300);
-      })
-      .catch(error => {
-        const { data } = error.response;
-        message.warning(data.message);
-      });
-  };
   React.useEffect(() => {
     if (heartAnimation) {
       setTimeout(() => {
@@ -257,33 +127,69 @@ export default ({
               }}>
               {Moment(dateTime, Define.dateFormat).startOf('hour').fromNow()}
             </span>
-
-            <Dropdown
-              overlay={buttonMenu}
-              size={40}
-              placement='bottomRight'
-              //TODO 오른쪽 정렬
-              style={{ float: 'right', marginLeft: 'auto' }}
-              arrow>
-              <Button
-                shape={'circle'}
-                style={{
-                  marginLeft: 150,
-                }}
-                onClick={() => {}}>
-                <img
-                  style={{
-                    maxWidth: 15,
-                    maxHeight: 15,
-                  }}
-                  src={MenuImage}
-                  alt={'menu'}
-                />
-              </Button>
-            </Dropdown>
           </div>
+          {boardWriter === getUserId() && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+              }}>
+              <Dropdown
+                overlay={() => (
+                  <Menu>
+                    <Menu.Item>
+                      <Button
+                        onClick={() => {
+                          setBoardEditMode(true);
+                        }}>
+                        게시글 수정
+                      </Button>
+                    </Menu.Item>
+                    <Menu.Item>
+                      <Button
+                        onClick={() => {
+                          //TODO 권한 체크
+                          Axios.post(`/board/delete/${boardId}`)
+                            .then(({ data }) => {
+                              setTimeout(() => {
+                                window.location.reload();
+                              }, 300);
+                            })
+                            .catch(error => {
+                              const { data } = error.response;
+                              message.warning(data.message);
+                            });
+                        }}>
+                        게시글 삭제
+                      </Button>
+                    </Menu.Item>
+                  </Menu>
+                )}
+                size={40}
+                placement='bottomRight'
+                arrow>
+                <Button
+                  shape={'circle'}
+                  style={{
+                    marginLeft: 150,
+                  }}
+                  onClick={() => {}}>
+                  <img
+                    style={{
+                      maxWidth: 15,
+                      maxHeight: 15,
+                    }}
+                    src={MenuImage}
+                    alt={'menu'}
+                  />
+                </Button>
+              </Dropdown>
+            </div>
+          )}
         </div>
       </div>
+
       {boardImages.length >= 1 && (
         <div
           style={{
@@ -293,7 +199,6 @@ export default ({
             overflow: 'hidden',
           }}
           onDoubleClick={() => {
-            console.log('run');
             activeHeartAnimation(true);
             if (!isAlreadyLike) {
               setIsAlreadyLike(true);
@@ -330,8 +235,11 @@ export default ({
                 style={{
                   width: contentSize,
                   height: contentSize,
-                  backgroundImage: `url(https://picsum.photos/700/700?${boardId})`,
-                  backgroundSize: 'cover',
+                  backgroundImage: `url(${Define.host}uploads/${image})`,
+                  backgroundSize: 'contain',
+                  backgroundPosition: 'center center',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundColor: '#d9d9d9',
                   float: 'left',
                 }}>
                 {/* <img src={`${Define.host}uploads/${image}`} alt={'사진'} /> */}
@@ -374,19 +282,80 @@ export default ({
           padding: 10,
           borderBottom: '1px solid #eee',
         }}>
-        {boardContents.split('\n').map((text, i) => {
-          return (
-            <p
-              key={i}
+        {isBoardEditMode ? (
+          <div
+            style={{
+              marginBottom: 10,
+              textAlign: 'right',
+            }}>
+            <TextareaAutoSize
               style={{
+                width: '100%',
+                padding: 10,
                 fontSize: 15,
-                marginBottom: 5,
-                wordBreak: 'break-all',
+                borderRadius: 5,
+                border: 'none',
+                resize: 'none',
+                backgroundColor: Colors.placeholder,
+              }}
+              defaultValue={defaultBoardContent}
+              onChange={({ nativeEvent }) => {
+                const text = nativeEvent.target.value;
+                setBoardContent(text);
+              }}
+            />
+            <Button
+              type={'primary'}
+              shape={'round'}
+              onClick={() => {
+                Axios.post(`/board/modify/${boardId}`, {
+                  title: '',
+                  content: `${boardContent}`,
+                  images: boardImages,
+                  category: 'free',
+                })
+                  .then(({ data }) => {
+                    setTimeout(() => {
+                      history.push('/');
+                      window.location.reload();
+                    }, 300);
+                  })
+                  .catch(error => {
+                    const { data } = error.response;
+                    message.warning(data.message);
+                  });
+
+                setBoardEditMode(false);
               }}>
-              {text}
-            </p>
-          );
-        })}
+              수정완료
+            </Button>
+            <Button
+              shape={'round'}
+              style={{
+                marginLeft: 5,
+              }}
+              onClick={() => {
+                setBoardContent(defaultBoardContent);
+                setBoardEditMode(false);
+              }}>
+              취소
+            </Button>
+          </div>
+        ) : (
+          boardContent.split('\n').map((text, i) => {
+            return (
+              <p
+                key={i}
+                style={{
+                  fontSize: 15,
+                  marginBottom: 5,
+                  wordBreak: 'break-all',
+                }}>
+                {text}
+              </p>
+            );
+          })
+        )}
         <div>
           <HeartTwoTone
             style={{
@@ -412,20 +381,7 @@ export default ({
           </span>
         </div>
       </div>
-      {/* <div className='App'>
-        <Heart
-          isClick={isAlreadyLike}
-          onClick={() => {
-            if (!isAlreadyLike) {
-              setLikeCount(likeCount + 1);
-            } else {
-              setLikeCount(likeCount - 1);
-            }
-            setIsAlreadyLike(!isAlreadyLike);
-          }}
-        />
-        <span>{likeCount}</span>
-      </div> */}
+
       <div
         style={{
           padding: 10,
@@ -435,48 +391,7 @@ export default ({
             return <div key={i} />;
           }
 
-          return (
-            <div key={i}>
-              <span>
-                <b
-                  style={{
-                    marginRight: 5,
-                  }}>
-                  익명{comment.userId}
-                </b>
-                <span
-                  style={{
-                    wordBreak: 'break-all',
-                  }}>
-                  {comment.contents}
-                </span>
-                <Button
-                  shape={'circle'}
-                  style={{
-                    marginLeft: 15,
-                  }}
-                  onClick={() => {
-                    //댓글 삭제 버튼
-                    delCommentList(comment.commentId);
-                  }}>
-                  X
-                </Button>
-              </span>
-              {/*comment.reply &&
-                comment.reply.map((reComment, i) => {
-                  return (
-                    <p key={i}>
-                      <span>
-                        <b> --- {reComment.writer}</b>
-                      </span>
-                      <span> : {reComment.comment}</span>
-                      <span>{reComment.datetime}</span>
-                      <span>X</span>
-                    </p>
-                  );
-                })*/}
-            </div>
-          );
+          return <Comment key={i} comment={comment} />;
         })}
         <div
           style={{
@@ -522,6 +437,157 @@ export default ({
           </Button>
         </div>
       </div>
+    </div>
+  );
+};
+
+const Comment = ({
+  comment: { id, contents: defaultComment = '', userId },
+}) => {
+  const [isCommentEditMode, setCommentEditMode] = React.useState(false);
+  const [comment, setComment] = React.useState(defaultComment);
+
+  return (
+    <div>
+      <span>
+        <b
+          style={{
+            marginRight: 5,
+          }}>
+          익명{userId}
+        </b>
+        <span
+          style={{
+            wordBreak: 'break-all',
+          }}>
+          {isCommentEditMode ? (
+            <div
+              style={{
+                marginBottom: 10,
+                textAlign: 'right',
+              }}>
+              <TextareaAutoSize
+                style={{
+                  width: '100%',
+                  padding: 10,
+                  fontSize: 15,
+                  borderRadius: 5,
+                  border: 'none',
+                  resize: 'none',
+                  backgroundColor: Colors.placeholder,
+                }}
+                defaultValue={comment}
+                onChange={({ nativeEvent }) => {
+                  const text = nativeEvent.target.value;
+                  setComment(text);
+                }}
+              />
+              <Button
+                type={'primary'}
+                shape={'round'}
+                onClick={() => {
+                  Axios.post(`/comment/modify`, {
+                    commentId: id,
+                    comment,
+                  })
+                    .then(({ data }) => {
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 300);
+                    })
+                    .catch(error => {
+                      const { data } = error.response;
+                      message.warning(data.message);
+                    });
+
+                  setCommentEditMode(false);
+                }}>
+                수정완료
+              </Button>
+              <Button
+                shape={'round'}
+                style={{
+                  marginLeft: 5,
+                }}
+                onClick={() => {
+                  setComment(defaultComment);
+                  setCommentEditMode(false);
+                }}>
+                취소
+              </Button>
+            </div>
+          ) : (
+            comment.split('\n').map((text, i) => {
+              return (
+                <p
+                  key={i}
+                  style={{
+                    fontSize: 15,
+                    marginBottom: 5,
+                    wordBreak: 'break-all',
+                  }}>
+                  {text}
+                </p>
+              );
+            })
+          )}
+        </span>
+        {userId === getUserId() && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+            }}>
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item>
+                    <Button
+                      onClick={() => {
+                        setCommentEditMode(true);
+                      }}>
+                      댓글 수정
+                    </Button>
+                  </Menu.Item>
+                  <Menu.Item>
+                    <Button
+                      onClick={() => {
+                        Axios.post(`/comment/delete`, {
+                          commentId: id,
+                        })
+                          .then(({ data }) => {
+                            setTimeout(() => {
+                              window.location.reload();
+                            }, 300);
+                          })
+                          .catch(error => {
+                            const { data } = error.response;
+                            console.log(data);
+                            message.warning(data.message);
+                          });
+                      }}>
+                      댓글 삭제
+                    </Button>
+                  </Menu.Item>
+                </Menu>
+              }
+              size={40}
+              placement={'bottomRight'}>
+              <Button type='text' style={{ size: 5 }} onClick={() => {}}>
+                <img
+                  style={{
+                    maxWidth: 15,
+                    maxHeight: 15,
+                  }}
+                  src={CommentMenuImage}
+                  alt={'menu'}
+                />
+              </Button>
+            </Dropdown>
+          </div>
+        )}
+      </span>
     </div>
   );
 };

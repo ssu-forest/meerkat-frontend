@@ -118,6 +118,7 @@ export default ({ onUpload = () => {} }) => {
                   message.warn('선택 파일이 사진 형식이 아닙니다.');
                 }
               }
+
               setImageList(temp);
             }}
             server={{
@@ -169,6 +170,9 @@ export default ({ onUpload = () => {} }) => {
             })
               .then(() => {
                 onUpload();
+                setTimeout(() => {
+                  window.location.reload();
+                }, 300);
               })
               .catch(error => {
                 const { data } = error.response;

@@ -34,6 +34,7 @@ export default () => {
         if (data.authorization) {
           Axios.defaults.headers.common['Authorization'] = data.authorization;
           window.sessionStorage.setItem('authorization', data.authorization);
+          window.sessionStorage.setItem('userid', data.data.id);
           setTimeout(() => {
             history.push('/');
             window.location.reload();

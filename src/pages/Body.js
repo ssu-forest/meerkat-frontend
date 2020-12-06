@@ -9,6 +9,7 @@ export default () => {
 
   const loadContents = () => {
     Axios.get('/board/free').then(response => {
+      console.log(response);
       const { data } = response;
       setCardList(data);
     });
