@@ -6,7 +6,7 @@ import Moment from 'moment';
 import { useWindowSize } from 'react-use';
 import { useSwipeable } from 'react-swipeable';
 import useReactRouter from 'use-react-router';
-
+import MenuImage from '../assets/images/menu.png';
 import { Define, Colors } from '../constants';
 import Axios from 'axios';
 
@@ -257,18 +257,28 @@ export default ({
               }}>
               {Moment(dateTime, Define.dateFormat).startOf('hour').fromNow()}
             </span>
+
             <Dropdown
               overlay={buttonMenu}
               size={40}
               placement='bottomRight'
+              //TODO 오른쪽 정렬
+              style={{ float: 'right', marginLeft: 'auto' }}
               arrow>
               <Button
                 shape={'circle'}
                 style={{
-                  marginLeft: 115,
+                  marginLeft: 150,
                 }}
                 onClick={() => {}}>
-                ...
+                <img
+                  style={{
+                    maxWidth: 15,
+                    maxHeight: 15,
+                  }}
+                  src={MenuImage}
+                  alt={'menu'}
+                />
               </Button>
             </Dropdown>
           </div>
