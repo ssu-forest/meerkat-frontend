@@ -4,6 +4,7 @@ import { Avatar, Dropdown, Input, Button, message, Menu } from 'antd';
 import { HeartTwoTone } from '@ant-design/icons';
 import Heart from 'react-animated-heart';
 import Moment from 'moment';
+import 'moment-timezone';
 import { useWindowSize } from 'react-use';
 import { useSwipeable } from 'react-swipeable';
 import useReactRouter from 'use-react-router';
@@ -23,14 +24,15 @@ export default ({
   boardImages = [],
   dateTime = '',
   like = 0,
+  isLike = false,
   comment = [],
 }) => {
   const { width: windowWidth, height: windowHeight } = useWindowSize();
-  const contentSize = (windowWidth > 1000 ? 1000 : windowWidth) - 22;
+  const contentSize = (windowWidth > 600 ? 600 : windowWidth) - 22;
 
   const [heartAnimation, activeHeartAnimation] = React.useState(false);
   const [animationFlag, setAnimationFlag] = React.useState(false);
-  const [isAlreadyLike, setIsAlreadyLike] = React.useState(false);
+  const [isAlreadyLike, setIsAlreadyLike] = React.useState(isLike);
   const [likeCount, setLikeCount] = React.useState(like);
   const [isBoardEditMode, setBoardEditMode] = React.useState(false);
   const [boardContent, setBoardContent] = React.useState(defaultBoardContent);
@@ -68,6 +70,17 @@ export default ({
           history.push('/');
           window.location.reload();
         }, 300);
+      })
+      .catch(error => {
+        const { data } = error.response;
+        message.warning(data.message);
+      });
+  };
+
+  const procLike = boardIdx => {
+    Axios.post(`/board/like/${boardIdx}`)
+      .then(response => {
+        console.log(response);
       })
       .catch(error => {
         const { data } = error.response;
@@ -125,7 +138,7 @@ export default ({
               style={{
                 color: '#aaa',
               }}>
-              {Moment(dateTime, Define.dateFormat).startOf('hour').fromNow()}
+              {Moment.tz(dateTime, 'Seoul/Asia').fromNow()}
             </span>
           </div>
           {boardWriter === getUserId() && (
@@ -370,6 +383,7 @@ export default ({
               } else {
                 setLikeCount(likeCount - 1);
               }
+              procLike(boardId);
               setIsAlreadyLike(!isAlreadyLike);
             }}
           />
